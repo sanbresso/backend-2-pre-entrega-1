@@ -29,7 +29,7 @@ git clone https://github.com/sanbresso/backend-2-pre-entrega-1
 
 2. Ingresar al directorio:
 
-cd plataforma-eventos-backend
+cd backend-2-pre-entrega-1
 
 3. Instalar dependencias:
 
