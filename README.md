@@ -25,7 +25,7 @@ roles, eventos, inscripciones y notificaciones.
 
 1. Clonar el repositorio:
 
-git clone URL_DEL_REPOSITORIO
+git clone https://github.com/sanbresso/backend-2-pre-entrega-1
 
 2. Ingresar al directorio:
 
