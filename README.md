@@ -1,125 +1,193 @@
 # Plataforma de Eventos e Inscripciones
 
-## Descripción
+## Pre-entrega 1 – Refactor arquitectónico inicial
 
-Proyecto backend desarrollado como parte del curso
-PBE II - Diseño y Arquitectura Backend.
+Proyecto desarrollado para el curso **PBE II – Diseño y Arquitectura Backend (Coderhouse)**.
 
-La aplicación está orientada a la gestión de eventos
-e inscripciones de usuarios.
+### 1. Descripción del proyecto
 
-Esta primera pre-entrega establece una arquitectura
-modular, preparada para incorporar autenticación,
-roles, eventos, inscripciones y notificaciones.
+La Plataforma de Eventos e Inscripciones es una API REST desarrollada con Node.js, Express y MongoDB.
 
-## Tecnologías
+El objetivo de esta primera pre-entrega es establecer una arquitectura backend modular, organizada por capas y preparada para incorporar nuevas funcionalidades.
+
+Se implementaron la configuración inicial del servidor, los recursos Events y Sessions, los modelos principales y la conexión real con MongoDB.
+
+Además, se incorporaron las capas DAO y Repository para separar el acceso a los datos de la lógica de aplicación.
+
+### 2. Tecnologías utilizadas
 
 - Node.js
 - Express.js
-- JavaScript con módulos ESM
-- MongoDB / Mongoose (modelos iniciales)
+- JavaScript con módulos ESM (import/export)
+- MongoDB
+- Mongoose
 - dotenv
 - Git y GitHub
 
-## Instalación
+### 3. Arquitectura del proyecto
 
-1. Clonar el repositorio:
+La aplicación utiliza una arquitectura organizada por capas:
 
-git clone https://github.com/sanbresso/backend-2-pre-entrega-1
+**Ruta → Controlador → Servicio → Repository → DAO → Modelo → MongoDB**
 
-2. Ingresar al directorio:
+Cada capa tiene una responsabilidad específica:
 
+- **Routes:** definición de endpoints HTTP.
+- **Controllers:** recepción de solicitudes y generación de respuestas.
+- **Services:** coordinación de la lógica de aplicación.
+- **Repositories:** abstracción del acceso a datos.
+- **DAO:** operaciones de persistencia utilizando Mongoose.
+- **Models:** definición de las entidades y esquemas.
+- **Middlewares:** procesamiento intermedio y manejo de errores.
+- **Config:** centralización de variables y conexión a MongoDB.
+- **Utils:** utilidades y pruebas de persistencia.
+
+Esta separación facilita el mantenimiento, la reutilización y las pruebas del sistema.
+
+### 4. Estructura de carpetas
+
+```text
+src/
+├── app.js
+├── server.js
+├── config/
+│   ├── env.js
+│   └── database.js
+├── routes/
+│   ├── health.router.js
+│   ├── events.router.js
+│   └── sessions.router.js
+├── controllers/
+│   ├── health.controller.js
+│   ├── events.controller.js
+│   └── sessions.controller.js
+├── services/
+│   └── events.service.js
+├── repositories/
+│   └── events.repository.js
+├── dao/
+│   └── events.dao.js
+├── models/
+│   ├── User.js
+│   ├── Event.js
+│   └── Inscription.js
+├── middlewares/
+│   └── error.middleware.js
+└── utils/
+    └── verifyPersistence.js
+```
+
+### 5. Instalación
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/sanbresso/backend-2-pre-entrega-1.git
+```
+
+Ingresar al proyecto:
+
+```bash
 cd backend-2-pre-entrega-1
+```
 
-3. Instalar dependencias:
+Instalar las dependencias:
 
+```bash
 npm install
+```
 
-## Variables de entorno
+### 6. Variables de entorno
 
-Crear un archivo .env tomando como referencia
-.env.example.
+El proyecto utiliza `dotenv` para gestionar variables de entorno.
 
-Variables necesarias:
+Crear un archivo `.env` tomando como referencia `.env.example`.
 
-- PORT: puerto del servidor.
-- NODE_ENV: entorno de ejecución.
-- MONGO_URL: conexión futura a MongoDB.
-- JWT_SECRET: clave para la futura autenticación.
+```bash
+cp .env.example .env
+```
 
-La conexión a MongoDB y la autenticación
-todavía no están implementadas en esta etapa.
+Variables requeridas:
 
-## Ejecución
+```dotenv
+PORT=8080
+NODE_ENV=development
+MONGO_URL=mongodb://127.0.0.1:27017/plataforma_eventos
+JWT_SECRET=reemplazar_por_clave_segura
+```
+
+La variable `MONGO_URL` debe configurarse según la instancia MongoDB utilizada, ya sea local o MongoDB Atlas.
+
+La variable `JWT_SECRET` queda preparada para las siguientes etapas del proyecto.
+
+El archivo `.env` está excluido del control de versiones mediante `.gitignore` para evitar publicar información sensible.
+
+### 7. Conexión a MongoDB
+
+La conexión se implementa en:
+
+`src/config/database.js`
+
+Se utiliza `mongoose.connect()` con la URL obtenida desde el módulo de configuración centralizada.
+
+El archivo `src/server.js` establece la conexión a MongoDB antes de iniciar Express.
+
+Si la conexión falla, se informa el error y el servidor no comienza a escuchar solicitudes.
+
+### 8. Ejecución
 
 Modo desarrollo:
 
+```bash
 npm run dev
+```
 
 Modo normal:
 
+```bash
 npm start
+```
 
-Puerto predeterminado: 8080.
+Con la configuración predeterminada, el servidor estará disponible en:
 
-## Estructura
+`http://localhost:8080`
 
-src/
-  app.js
-  server.js
-  config/
-  routes/
-  controllers/
-  services/
-  repositories/
-  dao/
-  models/
-  middlewares/
-  utils/
+La aplicación requiere una conexión MongoDB válida para iniciarse.
 
-## Endpoints disponibles
+### 9. Endpoints disponibles
 
-GET /api/health
+**GET /api/health**
 
-Respuesta:
-{"status":"ok","message":"Servidor activo"}
+Comprueba que el servidor está activo.
 
-GET /api/events
+Respuesta HTTP 200:
 
-Respuesta:
-{"status":"success","payload":[]}
+```json
+{
+  "status": "ok",
+  "message": "Servidor activo"
+}
+```
 
-GET /api/sessions
+**GET /api/events**
 
-Respuesta:
-{"status":"success","message":"Módulo de sesiones preparado"}
+Consulta los eventos almacenados en MongoDB mediante el flujo:
 
-## Arquitectura
+Router → Controller → Service → Repository → DAO → Event.
 
-La aplicación separa responsabilidades:
+Respuesta HTTP 200:
 
-- app.js: configuración de Express.
-- server.js: inicio del servidor.
-- routes/: definición de endpoints.
-- controllers/: solicitudes y respuestas HTTP.
-- services/: lógica de aplicación.
-- repositories/: acceso a datos futuro.
-- dao/: persistencia futura.
-- models/: esquemas de User y Event.
-- middlewares/: procesamiento intermedio.
-- config/: configuraciones.
-- utils/: funciones auxiliares futuras.
+```json
+{
+  "status": "success",
+  "payload": []
+}
+```
 
-## Estado del proyecto
+El arreglo `payload` estará vacío únicamente cuando no existan eventos en la base consultada. Si hay registros, contendrá los documentos recuperados.
 
-Pre-entrega 1: base arquitectónica inicial.
+En esta etapa inicial todavía no se implementan filtros de publicación ni controles de acceso para este endpoint.
 
-Pendiente para siguientes entregas:
+**GET /api/sessions**
 
-- Registro y login.
-- Autenticación con JWT y cookies.
-- Autorización por roles.
-- CRUD completo de eventos.
-- Inscripciones y control de cupos.
-- Notificaciones.
-- Persistencia efectiva en MongoDB.
+Endpoint informativo que verifica
