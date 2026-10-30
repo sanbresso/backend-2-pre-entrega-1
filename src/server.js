@@ -1,8 +1,26 @@
-import "dotenv/config";
 import app from "./app.js";
+import { connectDatabase } from "./config/database.js";
+import { env } from "./config/env.js";
 
-const PORT = Number(process.env.PORT) || 8080;
+async function startServer() {
+  try {
+    await connectDatabase();
 
-app.listen(PORT, () => {
-  console.log(`Servidor activo en http://localhost:${PORT}`);
-});
+    app.listen(env.port, () => {
+      console.log(
+        `Servidor activo en http://localhost:${env.port}`
+      );
+
+      console.log(`Entorno: ${env.nodeEnv}`);
+    });
+  } catch (error) {
+    console.error(
+      "Error al iniciar el servidor:",
+      error.message
+    );
+
+    process.exit(1);
+  }
+}
+
+startServer();
